@@ -1,0 +1,49 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+*.egg-info/
+build/
+dist/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Editors and operating systems
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Local databases and runtime state
+*.sqlite
+*.sqlite3
+*.db
+instance/
+.runtime/
+
+# Generated project artifacts (keep source manifests in Git)
+artifacts/
+renders/
+exports/
+media/generated/
+*.mp4
+*.mov
+*.mkv
+*.wav
+*.mp3
+*.flac
