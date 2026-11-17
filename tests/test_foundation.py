@@ -26,7 +26,7 @@ class FoundationTests(unittest.TestCase):
     def test_package_version_is_importable(self):
         import ai_yas
 
-        self.assertEqual(ai_yas.__version__, "0.1.0")
+        self.assertEqual(ai_yas.__version__, "0.2.0")
 
 
 if __name__ == "__main__":
