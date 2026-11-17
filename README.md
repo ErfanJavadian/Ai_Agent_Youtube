@@ -1,57 +1,70 @@
 # AI YouTube Autonomous System
 
-A GitHub-first, low-cost system for producing English-language faceless YouTube documentaries about AI, science, technology, and the future of humanity.
+A GitHub-first, low-cost assisted production system for English-language faceless documentaries about AI, science, technology, and the future of humanity.
 
-> **V1 is an assisted production pipeline, not a fully autonomous AI video generator.** It does not call external AI APIs or the YouTube Data API. Judgment-heavy work can be prepared as structured task packets for a human-operated AI chat interface, then brought back into the project.
+> **V1 is an assisted production pipeline, not a fully autonomous AI video generator.** It does not call external AI APIs or the YouTube Data API. Judgment-heavy work can be prepared as structured task packets for a human-operated AI chat interface, then imported and validated.
 
-## V1 goals
+## Current implementation
 
-- Track a video project through explicit, recoverable workflow states.
-- Keep research sources, factual claims, scripts, storyboards, assets, and render metadata structured.
-- Build a deterministic foundation for graphics-led video production.
-- Preserve source and asset licensing metadata.
-- Require human approval before publication.
-- Prepare a publishing package for manual upload through YouTube Studio.
+- **Phase 0 — Foundation:** repository metadata, JSON contracts, and CI.
+- **Phase 1 — Core Workflow Engine:** project creation, JSON persistence, explicit stage transitions, failure/block recovery, and a mandatory human approval gate.
 
-## Constraints and non-goals
+Production engines (research, scriptwriting, graphics, audio, rendering, analytics) are not implemented yet.
+
+## Constraints
 
 - No external AI APIs and no YouTube Data API.
-- No promise of automatic YouTube publishing in V1.
-- GitHub is the source of truth for code and project definitions; it is not assumed to be an always-on application server.
-- GitHub Actions jobs must remain bounded and will be evaluated before attempting video rendering.
-- Heavy local video generation or large language models are outside the initial scope.
-- Generated media and large render outputs should not be committed to this source repository.
+- No automatic publishing promise; V1 prepares a package for manual YouTube Studio upload.
+- GitHub is source control and CI, not an always-on application server.
+- GitHub Actions video rendering feasibility must be tested before use.
+- Large generated media and render outputs must stay outside this source repository.
 
 ## Repository map
 
-- `docs/ARCHITECTURE_V1.md` — approved V1 architecture blueprint.
+- `docs/ARCHITECTURE_V1.md` — V1 architecture blueprint.
 - `schemas/` — machine-readable project and workflow contracts.
-- `src/ai_yas/` — Python application package (foundation only at this stage).
-- `tests/` — standard-library foundation tests.
-- `.github/workflows/` — continuous integration.
+- `src/ai_yas/storage.py` — atomic JSON project storage.
+- `src/ai_yas/workflow.py` — deterministic workflow state machine.
+- `tests/` — foundation and workflow integration tests.
+- `.github/workflows/tests.yml` — Python 3.11/3.12 CI.
 
-## Current status
-
-Phase 0 — Foundation is being established. The schemas and package are contracts and scaffolding; production engines are not implemented yet.
-
-## Development
+## Quick start
 
 Requires Python 3.11 or newer.
-
-Run the foundation tests:
 
 ```bash
 python -m unittest discover -s tests -v
 ```
 
-No third-party runtime dependency is required for the current foundation tests.
+Example:
 
-## Workflow principles
+```python
+from ai_yas import ProjectStore, WorkflowEngine
 
-1. Validate project data at system boundaries.
-2. Use explicit states and bounded transitions.
-3. Preserve provenance for research and media assets.
-4. Treat retrieved documents and generated model output as untrusted input.
-5. Keep external actions separate from planning and require human approval for publication.
+engine = WorkflowEngine(ProjectStore("./workspace/projects"))
+engine.create_project(
+    project_id="first-documentary",
+    title="The Future of AI",
+    target_audience="Curious general audience",
+    topic="How AI may change science",
+)
+engine.start("first-documentary")
+engine.complete_current_stage("first-documentary", checkpoint_ref="intake/brief.json")
+```
 
-See [V1 Architecture](docs/ARCHITECTURE_V1.md) for system boundaries, contracts, and the phased implementation plan.
+A project starts at the `intake` stage. Each stage must be started and explicitly completed. At the final `approval` stage, a human must approve before the workflow can be completed.
+
+## Workflow stages
+
+`intake → research → strategy → script → storyboard → assets → audio → edit → quality_control → publishing_package → approval → complete`
+
+A failed or blocked workflow can be retried after its cause is addressed. Every transition is persisted to the project's JSON files.
+
+## Operational notes
+
+- Storage writes use temporary files and atomic replacement.
+- Project IDs are restricted to safe characters to prevent path traversal.
+- Concurrent writes to the same project are **not supported** in this version.
+- The current tests use Python's standard library; no network access or external API credentials are needed.
+
+See [V1 Architecture](docs/ARCHITECTURE_V1.md) for system boundaries and phased scope.
