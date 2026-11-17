@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/schemas/workflow_state.schema.json",
+  "title": "Video Workflow State",
+  "description": "Durable state and checkpoint metadata for a single production workflow.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "project_id",
+    "current_stage",
+    "status",
+    "updated_at",
+    "completed_stages"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "project_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "current_stage": {
+      "type": "string",
+      "enum": [
+        "intake",
+        "research",
+        "strategy",
+        "script",
+        "storyboard",
+        "assets",
+        "audio",
+        "edit",
+        "quality_control",
+        "publishing_package",
+        "approval",
+        "complete"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "not_started",
+        "ready",
+        "running",
+        "waiting_for_human",
+        "blocked",
+        "failed",
+        "completed",
+        "cancelled"
+      ]
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "completed_stages": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": [
+          "intake",
+          "research",
+          "strategy",
+          "script",
+          "storyboard",
+          "assets",
+          "audio",
+          "edit",
+          "quality_control",
+          "publishing_package",
+          "approval"
+        ]
+      }
+    },
+    "blocked_reason": {
+      "type": "string",
+      "maxLength": 2000
+    },
+    "last_error": {
+      "type": "string",
+      "maxLength": 4000
+    },
+    "attempt": {
+      "type": "integer",
+      "minimum": 0,
+      "default": 0
+    },
+    "checkpoint_ref": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 500
+    },
+    "human_approval": {
+      "type": "string",
+      "enum": [
+        "not_requested",
+        "pending",
+        "approved",
+        "rejected"
+      ],
+      "default": "not_requested"
+    }
+  }
+}
